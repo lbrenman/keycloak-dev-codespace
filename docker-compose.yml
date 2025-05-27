@@ -44,9 +44,8 @@ services:
     networks:
       - keycloak-network
 
-volumes:
-  # Using bind mount for persistence in Codespaces
-  # postgres_data:
+# volumes:
+  # Using bind mount for persistence in Codespaces - no named volumes needed
 
 networks:
   keycloak-network:
