@@ -1,0 +1,36 @@
+{
+  "name": "Keycloak Development Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "keycloak",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [8080, 5432],
+  "portsAttributes": {
+    "8080": {
+      "label": "Keycloak Admin Console",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL Database"
+    }
+  },
+  "postCreateCommand": "echo 'Keycloak development environment is ready!'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteUser": "root"
+}

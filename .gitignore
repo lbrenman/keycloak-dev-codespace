@@ -1,0 +1,27 @@
+# Docker
+.env
+docker-compose.override.yml
+
+# Keycloak data
+keycloak-data/
+postgres-data/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
