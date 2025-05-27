@@ -7,6 +7,9 @@ A simple setup for running Keycloak in GitHub Codespaces for development work.
 1. **Open in Codespaces**: Click the green "Code" button in GitHub and select "Create codespace on main"
 2. **Wait for setup**: The environment will automatically set up Keycloak with PostgreSQL
 3. **Access Keycloak**: Once ready, open `http://localhost:8080` in your browser
+4. On subsequent Codespace starts, tun `docker-compose up -d`
+
+> Note that you need to change the port visibility from private to public
 
 ## Default Credentials
 
@@ -134,3 +137,181 @@ docker-compose up -d
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
 - [Keycloak Admin Guide](https://www.keycloak.org/docs/latest/server_admin/)
 - [Keycloak Developer Guide](https://www.keycloak.org/docs/latest/server_development/)
+
+## REST API Calls
+
+https://www.keycloak.org/docs-api/latest/rest-api/index.html
+
+Create a Dedicated Service Account Client
+This is more secure for programmatic access:
+
+Create a client in the Keycloak admin console:
+
+Go to Clients → Create Client
+Client ID: api-client
+Client authentication: ON
+Service accounts roles: ON
+
+
+Get client credentials from the Credentials tab
+Use client credentials grant:
+
+```bash
+# Replace with your actual client secret
+CLIENT_SECRET="your-client-secret-here"
+
+TOKEN_RESPONSE=$(curl -s -X POST \
+  'https://your-codespace-url.app.github.dev/realms/master/protocol/openid-connect/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=client_credentials' \
+  -d 'client_id=api-client' \
+  -d 'client_secret='$CLIENT_SECRET)
+
+ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r '.access_token')
+```
+
+You will need to assign roles to your `api-client` service account to access the Admin REST API. Here's how to set it up:
+
+### Assign Admin Roles to Your Service Account
+
+1. **Go to your realm** (`lbrenman`) in Keycloak admin console
+2. **Navigate to**: Clients → `api-client` → **Service Account Roles** tab
+3. **Assign roles** depending on what level of access you need:
+
+#### Option A: Full Admin Access (Easiest)
+- **Client roles** → Select `realm-management` from dropdown
+- Assign: `realm-admin`
+
+This gives full administrative access to the realm.
+
+#### Option B: Specific Permissions (More Secure)
+Instead of `realm-admin`, assign only what you need:
+
+**For user management:**
+- `view-users`
+- `manage-users` 
+- `create-user`
+
+**For client management:**
+- `view-clients`
+- `manage-clients`
+
+**For realm configuration:**
+- `view-realm`
+- `manage-realm`
+
+**For identity providers:**
+- `view-identity-providers`
+- `manage-identity-providers`
+
+## Test Your API Access
+
+After assigning roles, test with your token:
+
+```bash
+# Get token
+TOKEN_RESPONSE=$(curl -s --location 'https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev/realms/lbrenman/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data 'grant_type=client_credentials' \
+--data 'client_id=api-client' \
+--data 'client_secret=NsFVZCo0Zf8TB4DfwN6cRzSgobgUBbs6')
+
+ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r '.access_token')
+
+# Test API calls
+# List users
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+'https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev/admin/realms/lbrenman/users'
+
+# Get realm info
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+'https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev/admin/realms/lbrenman'
+```
+
+## Role Reference
+
+Here are the main realm-management roles and what they allow:
+
+| Role | Permissions |
+|------|-------------|
+| `realm-admin` | Full administrative access |
+| `manage-users` | Create, update, delete users |
+| `view-users` | Read user information |
+| `manage-clients` | Create, update, delete clients |
+| `view-clients` | Read client information |
+| `manage-realm` | Configure realm settings |
+| `view-realm` | Read realm configuration |
+| `manage-identity-providers` | Configure SSO providers |
+| `view-identity-providers` | Read SSO provider configs |
+
+## Quick Verification
+
+You can also check what roles your service account has by decoding the JWT token:
+
+```bash
+# Decode the token payload (requires base64 and jq)
+echo $ACCESS_TOKEN | cut -d'.' -f2 | base64 -d 2>/dev/null | jq '.realm_access.roles'
+```
+
+Start with `realm-admin` for full access, then narrow it down to specific roles based on your actual needs for better security.
+
+## Common API Examples
+
+Once you have an access token:
+
+```bash
+# List all realms
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+  'https://your-codespace-url.app.github.dev/admin/realms'
+
+# Get users in master realm
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+  'https://your-codespace-url.app.github.dev/admin/realms/master/users'
+
+# Create a new user
+curl -X POST \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "enabled": true,
+    "firstName": "Test",
+    "lastName": "User",
+    "email": "test@example.com"
+  }' \
+  'https://your-codespace-url.app.github.dev/admin/realms/master/users'
+```
+
+## Quick Test Script
+Here's a simple script to test the API access:
+
+```bash
+#!/bin/bash
+KEYCLOAK_URL="https://your-codespace-url.app.github.dev"
+
+# Get token using admin credentials
+TOKEN_RESPONSE=$(curl -s -X POST \
+  "$KEYCLOAK_URL/realms/master/protocol/openid-connect/token" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password' \
+  -d 'client_id=admin-cli' \
+  -d 'username=admin' \
+  -d 'password=admin')
+
+if [ $? -eq 0 ]; then
+  ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r '.access_token')
+  
+  if [ "$ACCESS_TOKEN" != "null" ] && [ "$ACCESS_TOKEN" != "" ]; then
+    echo "✅ Successfully obtained access token"
+    
+    # Test API call
+    curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+      "$KEYCLOAK_URL/admin/realms" | jq '.[].realm'
+  else
+    echo "❌ Failed to get access token"
+    echo $TOKEN_RESPONSE | jq '.'
+  fi
+else
+  echo "❌ Failed to connect to Keycloak"
+fi
+```
