@@ -1,9 +1,6 @@
 {
   "name": "Keycloak Development Environment",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "keycloak",
-  "workspaceFolder": "/workspace",
-  "shutdownAction": "stopCompose",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/git:1": {},
@@ -19,7 +16,7 @@
       "label": "PostgreSQL Database"
     }
   },
-  "postCreateCommand": "echo 'Keycloak development environment is ready!'",
+  "postCreateCommand": "docker-compose up -d && echo 'Keycloak is starting up. Please wait a moment for it to be ready at http://localhost:8080'",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -32,5 +29,5 @@
       }
     }
   },
-  "remoteUser": "root"
+  "remoteUser": "vscode"
 }
