@@ -4,12 +4,18 @@ A simple setup for running Keycloak in GitHub Codespaces for development work.
 
 ## Quick Start
 
-1. **Open in Codespaces**: Click the green "Code" button in GitHub and select "Create codespace on main"
-2. **Wait for setup**: The environment will automatically set up Keycloak with PostgreSQL
-3. **Access Keycloak**: Once ready, open `http://localhost:8080` in your browser
-4. On subsequent Codespace starts, run `docker-compose up -d`
+1. Increase your Codespace timeout limit for inactivity as follows:
+  * Go to **GitHub > Settings > Codespaces**
+  * Under `Idle timeout`, increase the value (max is **240 minutes**)
+2. Fork repo
+3. **Open in Codespaces**: Click the green "Code" button in GitHub and select "Create codespace on main"
+4. **Wait for setup**: The environment will automatically set up Keycloak with PostgreSQL
+5. **Access Keycloak**: Once ready, open `http://localhost:8080` in your browser
+6. On subsequent Codespace starts, run `docker-compose up -d`
 
 ## Getting Started
+
+All references to http://localhost:8080 should use the Codespace forwarded port (e.g. `https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev`).
 
 * Change the port visibility from private to public
 * Log into the Admin Console at `http://localhost:8080/admin` with Username: `admin`, Password: `admin`
