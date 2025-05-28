@@ -7,9 +7,15 @@ A simple setup for running Keycloak in GitHub Codespaces for development work.
 1. **Open in Codespaces**: Click the green "Code" button in GitHub and select "Create codespace on main"
 2. **Wait for setup**: The environment will automatically set up Keycloak with PostgreSQL
 3. **Access Keycloak**: Once ready, open `http://localhost:8080` in your browser
-4. On subsequent Codespace starts, tun `docker-compose up -d`
+4. On subsequent Codespace starts, run `docker-compose up -d`
 
-> Note that you need to change the port visibility from private to public
+## Getting Started
+
+* Change the port visibility from private to public
+* Log into the Admin Console at `http://localhost:8080/admin` with Username: `admin`, Password: `admin`
+* The first thing you should do is create a realm as it is not recommended to use the master realm for anything other than managing Keycloak itself (e.g., managing other realms and admin users)
+* Your JWKS URL is: https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/certs
+* Your token URL is: https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/token
 
 ## Default Credentials
 
@@ -23,18 +29,6 @@ A simple setup for running Keycloak in GitHub Codespaces for development work.
 - **PostgreSQL 15**: Database backend for Keycloak
 - **Docker Compose**: Easy container orchestration
 - **VS Code Extensions**: JSON, YAML, and Docker support
-
-## File Structure
-
-```
-.
-├── .devcontainer/
-│   └── devcontainer.json     # Codespaces configuration
-├── docker-compose.yml        # Container definitions
-├── themes/                   # Custom Keycloak themes (optional)
-├── imports/                  # Realm import files (optional)
-└── README.md
-```
 
 ## Development Workflow
 
@@ -86,12 +80,6 @@ The setup uses development-friendly configurations:
 - Detailed logging enabled
 - Metrics and health endpoints enabled
 
-For production deployment, you'll need to:
-- Enable HTTPS
-- Set proper hostname
-- Use stronger passwords
-- Configure proper database settings
-
 ## Troubleshooting
 
 ### Keycloak won't start
@@ -137,6 +125,16 @@ docker-compose up -d
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
 - [Keycloak Admin Guide](https://www.keycloak.org/docs/latest/server_admin/)
 - [Keycloak Developer Guide](https://www.keycloak.org/docs/latest/server_development/)
+
+## JWKS Endpoint URL
+https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/certs
+
+e.g. https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev/realms/{realm-name}/protocol/openid-connect/certs
+
+## Token URL
+https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/token
+
+e.g. https://animated-space-succotash-wr545qpxc9qgx-8080.app.github.dev/realms/lbrenman/protocol/openid-connect/token
 
 ## REST API Calls
 
