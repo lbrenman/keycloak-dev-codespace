@@ -10,7 +10,7 @@ A simple setup for running Keycloak in GitHub Codespaces for development work.
 2. Fork repo
 3. **Open in Codespaces**: Click the green "Code" button in GitHub and select "Create codespace on main"
 4. **Wait for setup**: The environment will automatically set up Keycloak with PostgreSQL
-5. **Access Keycloak**: Once ready, open `http://localhost:8080` in your browser
+5. **Access Keycloak**: Once ready, open `http://localhost:8080/admin` in your browser
 6. On subsequent Codespace starts, run `docker-compose up -d`
 
 ## Getting Started
