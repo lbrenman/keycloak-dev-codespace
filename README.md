@@ -22,6 +22,7 @@ All references to http://localhost:8080 should use the Codespace forwarded port 
 * The first thing you should do is create a realm as it is not recommended to use the master realm for anything other than managing Keycloak itself (e.g., managing other realms and admin users)
 * Your JWKS URL is: https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/certs
 * Your token URL is: https://your-keycloak-url/realms/{realm-name}/protocol/openid-connect/token
+* Your Authorization URL is: https://your-keycloak-url/auth/realms/{realm-name}/protocol/openid-connect/auth
 
 ## Default Credentials
 
