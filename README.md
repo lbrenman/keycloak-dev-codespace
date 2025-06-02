@@ -320,3 +320,63 @@ else
   echo "❌ Failed to connect to Keycloak"
 fi
 ```
+
+## Client Registration
+
+You can use the admin API with OAuth2 to create and manage clients.
+
+For Dynamic Client Registration you can also create an Initial access token (Client -> Initial access token) and make a call to the `/realms/<realm>/clients-registrations/openid-connect` endpoint using this Bearer token.
+
+For example:
+
+```bash
+curl --location 'https://cuddly-train-r44r5655jfx7xv-8080.app.github.dev/realms/lbrenman/clients-registrations/openid-connect' \
+--header 'Content-Type: application/json' \
+--data '{
+  "client_name": "my-test-client",
+  "token_endpoint_auth_method": "client_secret_basic",
+  "redirect_uris":[
+    "https://test123.com/callback"
+    ],
+  "grant_types":[
+    "client_credentials"
+    ]
+}'
+```
+
+With response:
+
+```json
+{
+    "redirect_uris": [
+        "https://test123.com/callback"
+    ],
+    "token_endpoint_auth_method": "client_secret_basic",
+    "grant_types": [
+        "authorization_code",
+        "client_credentials"
+    ],
+    "response_types": [
+        "code",
+        "none"
+    ],
+    "client_id": "f5f02504-ebc7-47b4-9082-84798c766d8b",
+    "client_secret": "7V63XOsFX97p9I7Z4HimBIhD8sKyTFpM",
+    "client_name": "my-client10",
+    "scope": "address phone offline_access microprofile-jwt",
+    "subject_type": "public",
+    "request_uris": [],
+    "tls_client_certificate_bound_access_tokens": false,
+    "dpop_bound_access_tokens": false,
+    "post_logout_redirect_uris": [
+        "https://test123.com/callback"
+    ],
+    "client_id_issued_at": 1748879746,
+    "client_secret_expires_at": 0,
+    "registration_client_uri": "https://cuddly-train-r44r5655jfx7xv-8080.app.github.dev/realms/lbrenman/clients-registrations/openid-connect/f5f02504-ebc7-47b4-9082-84798c766d8b",
+    "registration_access_token": "eyJh...nISuE-54",
+    "backchannel_logout_session_required": false,
+    "require_pushed_authorization_requests": false,
+    "frontchannel_logout_session_required": false
+}
+```
